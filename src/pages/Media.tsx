@@ -9,7 +9,16 @@ function MediaPreview({ item }: { item: { kind: string; uri: string; name: strin
   if (item.kind === 'image') {
     if (failed) {
       return (
-        <div className="meta" style={{ height: 120, displayContent: 'center' }}>
+        <div
+          className="meta"
+          style={{
+            height: 120,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           Image unavailable
           <div>
             <a href={src} target="_blank" rel="noreferrer" style={{ color: 'var(--pink)' }}>
