@@ -8,6 +8,7 @@ const LINKS = [
   ['/reports', 'Reports'],
   ['/users', 'Users'],
   ['/media', 'Media'],
+  ['/frames', 'Frames'],
   ['/moderation', 'Moderation'],
   ['/analytics', 'Analytics'],
   ['/invite-links', 'Invite Links'],

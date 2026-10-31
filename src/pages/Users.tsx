@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { DetailLink, ErrorBox, Loading, PageHeader, StatusBadge } from '../components/ui';
 
@@ -51,6 +51,7 @@ export function UsersList() {
 
 export function UserDetail() {
   const { id = '' } = useParams();
+  const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState('');
 
@@ -83,6 +84,17 @@ export function UserDetail() {
         </button>
         <button className="btn danger" type="button" onClick={() => api.patchUser(id, { lifecycle: 'suspended' }).then(load)}>
           Suspend
+        </button>
+        <button
+          className="btn danger"
+          type="button"
+          onClick={async () => {
+            if (!confirm(`Delete ${data.user.name}, their surprises, wishes, and uploaded media? This cannot be undone.`)) return;
+            await api.deleteUser(id);
+            navigate('/users');
+          }}
+        >
+          Delete user
         </button>
       </div>
       <div className="card table-wrap">

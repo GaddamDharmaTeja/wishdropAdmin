@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { DetailLink, ErrorBox, Loading, PageHeader, StatusBadge } from '../components/ui';
 
@@ -79,6 +79,7 @@ export function SurprisesList() {
 
 export function SurpriseDetail() {
   const { id = '' } = useParams();
+  const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -121,6 +122,17 @@ export function SurpriseDetail() {
               }}
             >
               Disable invite
+            </button>
+            <button
+              className="btn danger"
+              type="button"
+              onClick={async () => {
+                if (!confirm(`Delete “${surprise.title}” and all of its wishes and media? This cannot be undone.`)) return;
+                await api.deleteSurprise(id);
+                navigate('/surprises');
+              }}
+            >
+              Delete surprise
             </button>
           </div>
         }

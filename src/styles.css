@@ -120,5 +120,8 @@ th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spa
 .media-tile { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; }
 .media-tile img { width: 100%; height: 120px; object-fit: cover; display: block; background: #f3edf8; }
 .media-tile .meta { padding: 10px; font-size: 12px; }
+.frame-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.frame-card { overflow: hidden; background: var(--white); border: 1px solid var(--line); border-radius: 16px; }
+.frame-card > img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: #f3edf8; }
 .chart-box { width: 100%; height: 260px; }
 .empty { color: var(--muted); padding: 24px 0; }

@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './auth';
 import { AdminLayout } from './layout/AdminLayout';
 import AnalyticsPage from './pages/Analytics';
 import Dashboard from './pages/Dashboard';
+import FramesPage from './pages/Frames';
 import InviteLinksPage from './pages/InviteLinks';
 import Login from './pages/Login';
 import MediaPage from './pages/Media';
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="users" element={<UsersList />} />
             <Route path="users/:id" element={<UserDetail />} />
             <Route path="media" element={<MediaPage />} />
+            <Route path="frames" element={<FramesPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="invite-links" element={<InviteLinksPage />} />
             <Route path="notifications" element={<NotificationsPage />} />

@@ -1,17 +1,18 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/v1';
 const API_ORIGIN = API_URL.replace(/\/v1\/?$/, '');
 
-/** Rewrite stored media hosts (LAN IP, etc.) to the API origin used by admin. */
+/** Rewrite stored asset hosts (LAN IP, etc.) to the API origin used by admin. */
 export function resolveMediaUrl(uri?: string | null) {
   if (!uri) return '';
+  const rewritePath = (pathname: string, search = '') => `${API_ORIGIN}${pathname}${search}`;
   try {
     const parsed = new URL(uri);
-    if (parsed.pathname.startsWith('/media/')) {
-      return `${API_ORIGIN}${parsed.pathname}${parsed.search}`;
+    if (parsed.pathname.startsWith('/media/') || parsed.pathname.startsWith('/frames/')) {
+      return rewritePath(parsed.pathname, parsed.search);
     }
     return uri;
   } catch {
-    if (uri.startsWith('/media/')) return `${API_ORIGIN}${uri}`;
+    if (uri.startsWith('/media/') || uri.startsWith('/frames/')) return rewritePath(uri);
     return uri;
   }
 }
@@ -69,7 +70,7 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
-      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(options.body && !(options.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}),
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...options.headers,
     },
@@ -103,6 +104,7 @@ export const api = {
   surprise: (id: string) => request<any>(`/admin/surprises/${id}`),
   patchSurprise: (id: string, payload: Record<string, unknown>) =>
     request<any>(`/admin/surprises/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  deleteSurprise: (id: string) => request<any>(`/admin/surprises/${id}`, { method: 'DELETE' }),
   regenerateInvite: (id: string) => request<any>(`/admin/surprises/${id}/invite/regenerate`, { method: 'POST' }),
   disableInvite: (id: string) => request<any>(`/admin/surprises/${id}/invite/disable`, { method: 'POST' }),
   wishes: (params = '') => request<any>(`/admin/wishes${params}`),
@@ -118,7 +120,17 @@ export const api = {
   user: (id: string) => request<any>(`/admin/users/${id}`),
   patchUser: (id: string, payload: Record<string, unknown>) =>
     request<any>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  deleteUser: (id: string) => request<any>(`/admin/users/${id}`, { method: 'DELETE' }),
   media: (params = '') => request<any>(`/admin/media${params}`),
+  frames: () => request<any>('/admin/frames'),
+  createFrame: (payload: Record<string, unknown>) => request<any>('/admin/frames', { method: 'POST', body: JSON.stringify(payload) }),
+  patchFrame: (id: string, payload: Record<string, unknown>) => request<any>(`/admin/frames/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  deleteFrame: (id: string) => request<any>(`/admin/frames/${id}`, { method: 'DELETE' }),
+  uploadFrame: (file: File) => {
+    const data = new FormData();
+    data.append('file', file);
+    return request<{ url: string }>('/admin/frames/upload', { method: 'POST', body: data });
+  },
   deleteMedia: (id: string) => request<any>(`/admin/media/${id}`, { method: 'DELETE' }),
   inviteLinks: (params = '') => request<any>(`/admin/invite-links${params}`),
   notifications: (params = '') => request<any>(`/admin/notifications${params}`),
@@ -126,6 +138,8 @@ export const api = {
   settings: () => request<any>('/admin/settings'),
   patchSettings: (payload: Record<string, unknown>) =>
     request<any>('/admin/settings', { method: 'PATCH', body: JSON.stringify(payload) }),
+  clearData: (scope: 'content' | 'all-data' | 'sessions') =>
+    request<any>('/admin/maintenance/clear', { method: 'POST', body: JSON.stringify({ scope, confirmation: 'CLEAR' }) }),
   logout: async () => {
     try {
       await request('/auth/logout', { method: 'POST' });
